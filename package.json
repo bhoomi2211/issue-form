@@ -8,9 +8,10 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "build:widget": "parcel build src/index.js"
+    "build:widget": "parcel build src/main.jsx"
   },
   "dependencies": {
+    "@tabler/icons-react": "^3.31.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
