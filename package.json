@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "build:widget": "parcel build src/main.jsx"
+    "build:widget": "parcel build src/main.jsx --no-source-maps"
   },
   "dependencies": {
     "@tabler/icons-react": "^3.31.0",

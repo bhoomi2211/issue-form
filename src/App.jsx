@@ -1,52 +1,97 @@
 import React, { useState } from 'react';
+import './App.css';
 
 const App = () => {
   const [isOpen, setIsOpen] = useState(false);
 
+  // Form state
+  const [location, setLocation] = useState('');
+  const [priority, setPriority] = useState('');
+  const [details, setDetails] = useState('');
+  const [device, setDevice] = useState('');
+  const [browser, setBrowser] = useState('');
+  const [os, setOs] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const data = {
+      location,
+      priority,
+      details,
+      device,
+      browser,
+      os,
+    };
+
+    try {
+      const response = await fetch('http://localhost:5000/api/create-issue', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        alert('Bug report submitted successfully!');
+        setIsOpen(false);
+        // Clear form
+        setLocation('');
+        setPriority('');
+        setDetails('');
+        setDevice('');
+        setBrowser('');
+        setOs('');
+      } else {
+        alert('Failed to submit bug report.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error submitting bug report.');
+    }
+  };
+
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-indigo-100 via-purple-100 to-pink-100 flex items-center justify-center p-6 font-sans">
-      {/* Floating Toggle Button */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 bg-gradient-to-r from-purple-600 to-pink-500 text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out z-50"
-      >
+    <div className="app-container">
+      <button onClick={() => setIsOpen(true)} className="toggle-button">
         Report Bug 🐞
       </button>
 
-      {/* Modal */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-40">
-          <div className="relative bg-white/30 backdrop-blur-xl p-8 rounded-3xl shadow-2xl w-full max-w-2xl border border-white/20 h-[80vh] overflow-hidden">
-            {/* Close Button */}
-            <button
-              onClick={() => setIsOpen(false)}
-              className="absolute top-4 right-4 text-white bg-red-500 hover:bg-red-600 rounded-full p-2 shadow-md transition"
-            >
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <button onClick={() => setIsOpen(false)} className="close-button">
               ✖
             </button>
 
-            {/* Header */}
-            <h2 className="text-2xl font-bold text-center text-white bg-gradient-to-r from-indigo-500 to-purple-500 py-3 px-6 rounded-xl shadow-inner tracking-wide">
-              🐞 Report a Bug
-            </h2>
+            <h2 className="modal-header">🐞 Report a Bug</h2>
 
-            {/* Form */}
-            <form className="mt-6 space-y-4 text-sm overflow-y-auto max-h-[calc(80vh-100px)] pr-2">
+            <form className="modal-form" onSubmit={handleSubmit}>
               <div>
-                <label className="block text-gray-800 font-medium mb-1">Where was this bug found?</label>
+                <label className="label">Where was this bug found?</label>
                 <input
                   type="text"
-                  className="w-full p-2 bg-white/70 backdrop-blur border border-gray-300 rounded-lg shadow-inner focus:ring-2 focus:ring-purple-400 outline-none text-sm"
+                  className="input"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
                   placeholder="e.g., Dashboard > Profile"
                 />
               </div>
 
               <div>
-                <label className="block text-gray-800 font-medium mb-1">Priority *</label>
-                <div className="flex justify-between text-gray-700">
+                <label className="label">Priority *</label>
+                <div className="radio-group">
                   {['High', 'Medium', 'Low'].map((level) => (
-                    <label key={level} className="flex items-center gap-2 cursor-pointer">
-                      <input type="radio" name="priority" className="accent-purple-600" />
+                    <label key={level} className="radio-option">
+                      <input
+                        type="radio"
+                        name="priority"
+                        value={level}
+                        className="radio-input"
+                        checked={priority === level}
+                        onChange={(e) => setPriority(e.target.value)}
+                      />
                       <span>{level}</span>
                     </label>
                   ))}
@@ -54,18 +99,24 @@ const App = () => {
               </div>
 
               <div>
-                <label className="block text-gray-800 font-medium mb-1">Details</label>
+                <label className="label">Details</label>
                 <textarea
-                  className="w-full p-2 bg-white/70 backdrop-blur border border-gray-300 rounded-lg shadow-inner h-20 resize-none focus:ring-2 focus:ring-purple-400 outline-none text-sm"
+                  className="textarea"
+                  value={details}
+                  onChange={(e) => setDetails(e.target.value)}
                   placeholder="Describe what happened and how to reproduce it..."
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid-container">
                 <div>
-                  <label className="block text-gray-800 font-medium mb-1">Device Used *</label>
-                  <select className="w-full p-2 bg-white/70 backdrop-blur border border-gray-300 rounded-lg shadow-inner focus:ring-2 focus:ring-purple-400 outline-none text-sm">
-                    <option>Select Option</option>
+                  <label className="label">Device Used *</label>
+                  <select
+                    className="select"
+                    value={device}
+                    onChange={(e) => setDevice(e.target.value)}
+                  >
+                    <option value="">Select Option</option>
                     <option>Desktop</option>
                     <option>iOS</option>
                     <option>Android</option>
@@ -74,9 +125,13 @@ const App = () => {
                 </div>
 
                 <div>
-                  <label className="block text-gray-800 font-medium mb-1">Browser</label>
-                  <select className="w-full p-2 bg-white/70 backdrop-blur border border-gray-300 rounded-lg shadow-inner focus:ring-2 focus:ring-purple-400 outline-none text-sm">
-                    <option>Select Option</option>
+                  <label className="label">Browser</label>
+                  <select
+                    className="select"
+                    value={browser}
+                    onChange={(e) => setBrowser(e.target.value)}
+                  >
+                    <option value="">Select Option</option>
                     <option>Google Chrome</option>
                     <option>Firefox</option>
                     <option>Microsoft Edge</option>
@@ -84,10 +139,14 @@ const App = () => {
                   </select>
                 </div>
 
-                <div className="md:col-span-2">
-                  <label className="block text-gray-800 font-medium mb-1">Operating System</label>
-                  <select className="w-full p-2 bg-white/70 backdrop-blur border border-gray-300 rounded-lg shadow-inner focus:ring-2 focus:ring-purple-400 outline-none text-sm">
-                    <option>Select Option</option>
+                <div className="grid-full">
+                  <label className="label">Operating System</label>
+                  <select
+                    className="select"
+                    value={os}
+                    onChange={(e) => setOs(e.target.value)}
+                  >
+                    <option value="">Select Option</option>
                     <option>Windows</option>
                     <option>Linux</option>
                     <option>iOS</option>
@@ -96,8 +155,8 @@ const App = () => {
                 </div>
               </div>
 
-              <div className="text-center pt-2">
-                <button className="bg-gradient-to-r from-purple-600 to-pink-500 text-white font-semibold px-8 py-1 rounded-full shadow-md hover:scale-105 transition-transform duration-300 ease-in-out text-sm">
+              <div className="submit-button-container">
+                <button type="submit" className="submit-button">
                   ✉️ Submit
                 </button>
               </div>
