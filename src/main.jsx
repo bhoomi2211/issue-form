@@ -3,8 +3,11 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 
-createRoot(document.getElementById('root')).render(
+const element = document.getElementById('issue-tracker')
+const siteKey = element.getAttribute('data-site-key')
+
+createRoot(document.getElementById('issue-tracker')).render(
   <StrictMode>
-    <App />
+    <App site_key={siteKey} />
   </StrictMode>,
 )
